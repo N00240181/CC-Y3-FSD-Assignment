@@ -8,6 +8,7 @@
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
+COPY prisma ./prisma
 RUN npm ci
 
 # ---- production: the image actually shipped ------------------------------
@@ -19,6 +20,7 @@ COPY package.json package-lock.json ./
 COPY --from=deps /app/node_modules ./node_modules
 RUN npm prune --omit=dev
 
+COPY prisma ./prisma
 COPY src ./src
 
 # The official node image already ships a non-root `node` user — no need to

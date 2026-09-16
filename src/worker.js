@@ -23,6 +23,16 @@
 //
 //   worker.on('completed', (job) => console.log(`[worker] ${job.name} completed.`));
 //   worker.on('failed', (job, err) => console.error(`[worker] ${job?.name ?? 'job'} failed:`, err));
+import './events/index.js';
+import { Worker } from 'bullmq';
+import connection from './config/redis.js';
+import { QUEUE_NAME } from './jobs/yourJob.queue.js';
+import processYourJob from './jobs/yourJob.job.js';
+
+const worker = new Worker(QUEUE_NAME, processYourJob, { connection });
+
+worker.on('completed', (job) => console.log(`[worker] ${job.name} completed.`));
+worker.on('failed', (job, err) => console.error(`[worker] ${job?.name ?? 'job'} failed:`, err));
 console.log('Worker started — no jobs or events wired up yet.');
 
 // Nothing above keeps Node's event loop alive, so without this the process
