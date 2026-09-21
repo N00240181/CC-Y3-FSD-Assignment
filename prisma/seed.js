@@ -30,12 +30,14 @@ async function main() {
     const [member1, member2] = await Promise.all([
         prisma.member.create({
             data: {
-                name: 'Mike Shinoda'
+                bandId: band1.id,
+                name: 'Mike Shinoda',
             },
         }),
         prisma.member.create({
             data: {
-                name: 'Lars'
+                bandId: band2.id,
+                name: 'Lars',
             },
         }),
     ]);
@@ -62,6 +64,9 @@ async function main() {
     const [booking1] = await Promise.all([
         prisma.booking.create({
             data: {
+                bandId: band1.id,
+                customerId: customer1.id,
+                venueId: venue1.id,
                 price: 125,
                 date: 26/10/1,
                 bookingTime: 26/7/12,
