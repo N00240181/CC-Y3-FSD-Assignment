@@ -7,12 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TicketCategory {
+  standing
+  sitting
+}
+
 model Band {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
   memberCount Int
-  bookings    Booking[]
   members     Member[]
+  events      Event[]
 }
 
 model Member {
@@ -23,18 +28,22 @@ model Member {
   band Band @relation(fields: [bandId], references: id)
 }
 
+model Ticket {
+  id       Int            @id @default(autoincrement())
+  eventId  Int
+  category TicketCategory
+  price    Int
+  bookings Booking[]
+}
+
 model Booking {
   id          Int      @id @default(autoincrement())
-  bandId      Int
+  ticketId    Int
   customerId  Int
-  venueId     Int
-  price       Int
-  date        DateTime
   bookingTime DateTime @default(now())
 
-  band     Band     @relation(fields: [bandId], references: [id])
+  ticket   Ticket   @relation(fields: [ticketId], references: [id])
   customer Customer @relation(fields: [customerId], references: [id])
-  venue    Venue    @relation(fields: [venueId], references: [id])
 }
 
 model Customer {
@@ -47,9 +56,19 @@ model Customer {
 }
 
 model Venue {
-  id       Int       @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   name     String
   location String
   capacity Int
-  bookings Booking[]
+  events   Event[]
+}
+
+model Event {
+  id      Int      @id @default(autoincrement())
+  bandId  Int
+  venueId Int
+  date    DateTime
+
+  venue Venue @relation(fields: [venueId], references: [id])
+  band  Band  @relation(fields: [bandId], references: [id])
 }
