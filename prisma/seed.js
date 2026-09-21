@@ -1,28 +1,29 @@
 import prisma from '../src/config/db.js';
-import { hashPassword } from '../src/utils/password.js'
+import { hashPassword } from '../src/utils/password.js';
 
 const DEV_PASSWORD = 'password123';
 
 async function main() {
-    await prisma.band.deleteMany();
-    await prisma.member.deleteMany();
     await prisma.booking.deleteMany();
+    await prisma.member.deleteMany();
+    
+    await prisma.band.deleteMany();
     await prisma.customer.deleteMany();
     await prisma.venue.deleteMany();
 
-    const hashedPassword = await hashPassword(DEV_PASSWORD)
+    const hashedPassword = await hashPassword(DEV_PASSWORD);
 
     const [band1, band2] = await Promise.all([
         prisma.band.create({
             data: {
                 name: 'Metallica',
-                members: 20,
+                memberCount: 20,
             },
         }),
         prisma.band.create({
             data: {
                 name: 'Linkin Park',
-                members: 6,
+                memberCount: 6,
             },
         }),
     ]);
@@ -61,19 +62,6 @@ async function main() {
         }),
     ]);
 
-    const [booking1] = await Promise.all([
-        prisma.booking.create({
-            data: {
-                bandId: band1.id,
-                customerId: customer1.id,
-                venueId: venue1.id,
-                price: 125,
-                date: 26/10/1,
-                bookingTime: 26/7/12,
-            },
-        }),
-    ]);
-
     const [venue1] = await Promise.all([
         prisma.venue.create({
             data: {
@@ -84,12 +72,24 @@ async function main() {
         }),
     ]);
 
-    main()
+    const [booking1] = await Promise.all([
+        prisma.booking.create({
+            data: {
+                bandId: band1.id,
+                customerId: customer1.id,
+                venueId: venue1.id,
+                price: 125,
+                date: new Date('2026-10-01'),
+                bookingTime: new Date('2026-07-12T12:00:00'),
+            },
+        }),
+    ]);
+}
+
+main()
     .catch((err) => {
-        console.error(err);
         process.exitCode = 1;
     })
     .finally(async () => {
         await prisma.$disconnect();
     });
-}
