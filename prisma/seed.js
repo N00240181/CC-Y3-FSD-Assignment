@@ -1,3 +1,4 @@
+import { TicketCategory } from '@prisma/client';
 import prisma from '../src/config/db.js';
 import { hashPassword } from '../src/utils/password.js';
 
@@ -5,13 +6,16 @@ const DEV_PASSWORD = 'password123';
 
 async function main() {
     await prisma.booking.deleteMany();
+    await prisma.ticket.deleteMany();
+    await prisma.event.deleteMany();
     await prisma.member.deleteMany();
-    
-    await prisma.band.deleteMany();
     await prisma.customer.deleteMany();
     await prisma.venue.deleteMany();
+    await prisma.band.deleteMany();
 
     const hashedPassword = await hashPassword(DEV_PASSWORD);
+
+    console.log("deleted old content");
 
     const [band1, band2] = await Promise.all([
         prisma.band.create({
@@ -28,6 +32,8 @@ async function main() {
         }),
     ]);
 
+    console.log("created bands");
+
     const [member1, member2] = await Promise.all([
         prisma.member.create({
             data: {
@@ -43,6 +49,8 @@ async function main() {
         }),
     ]);
 
+    console.log("created members");
+    
     const [customer1, customer2] = await Promise.all([
         prisma.customer.create({
             data: {
@@ -62,6 +70,8 @@ async function main() {
         }),
     ]);
 
+    console.log("created customers");
+    
     const [venue1] = await Promise.all([
         prisma.venue.create({
             data: {
@@ -72,15 +82,38 @@ async function main() {
         }),
     ]);
 
+    console.log("created venues");
+    
+    const [event1] = await Promise.all([
+        prisma.event.create({
+            data: {
+                bandId: band1.id,
+                venueId: venue1.id,
+                date: new Date('2026-10-01'),
+            },
+        }),
+    ]);
+
+    console.log("created tickets");
+    
+    const [ticket1] = await Promise.all([
+        prisma.ticket.create({
+            data: {
+                eventId: event1.id,
+                category: TicketCategory.standing,
+                price: 80
+            }
+        })
+    ])
+
+    console.log("created bookings");
+    
     const [booking1] = await Promise.all([
         prisma.booking.create({
             data: {
-                bandId: band1.id,
+                ticketId: ticket1.id,
                 customerId: customer1.id,
-                venueId: venue1.id,
-                price: 125,
-                date: new Date('2026-10-01'),
-                bookingTime: new Date('2026-07-12T12:00:00'),
+                bookingTime: new Date('2026-05-10 12:00:00'),
             },
         }),
     ]);

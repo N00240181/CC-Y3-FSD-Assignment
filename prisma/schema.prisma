@@ -38,7 +38,7 @@ model Ticket {
 
 model Booking {
   id          Int      @id @default(autoincrement())
-  ticketId    Int
+  ticketId    Int @default(1)
   customerId  Int
   bookingTime DateTime @default(now())
 
