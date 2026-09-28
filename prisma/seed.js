@@ -1,4 +1,5 @@
 import { TicketCategory } from '@prisma/client';
+import { AccountType } from '@prisma/client';
 import prisma from '../src/config/db.js';
 import { hashPassword } from '../src/utils/password.js';
 
@@ -58,6 +59,8 @@ async function main() {
                 lastName: 'Cartman',
                 age: 25,
                 email: 'intheghetto@gmail.com',
+                password: 'password',
+                type: AccountType.admin,
             },
         }),
         prisma.customer.create({
@@ -66,6 +69,8 @@ async function main() {
                 lastName: 'Block',
                 age: 23,
                 email: 'worldoftshirts@gmail.com',
+                password: 'coffee67',
+                type: AccountType.customer,
             },
         }),
     ]);
