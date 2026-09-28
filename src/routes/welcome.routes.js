@@ -1,11 +1,11 @@
 import express from 'express';
 import asyncHandler from '../middleware/asyncHandler.js';
-import { getWelcome } from '../controllers/booking.controller.js';
-import bookingRoutes from './booking.routes.js';
+import { getWelcome } from '../controllers/event.controller.js';
+import eventRoutes from './event.routes.js';
 
 const router = express.Router();
 
 router.get('/', asyncHandler(getWelcome));
-router.use('/bookings', bookingRoutes )
+router.use('/events', eventRoutes);
 
 export default router;

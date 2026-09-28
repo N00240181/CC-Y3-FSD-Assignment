@@ -5,6 +5,6 @@ import welcomeRoutes from './welcome.routes.js';
 
 const router = express.Router();
 
-router.use('/welcome', welcomeRoutes);
+router.use('/', welcomeRoutes);
 
 export default router;

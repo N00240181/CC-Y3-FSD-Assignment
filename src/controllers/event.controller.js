@@ -51,3 +51,7 @@ export const deleteEvent = asyncHandler(async (req, res) => {
   await eventService.deleteEvent(req.params.id);
   res.status(204).end();
 });
+
+export const getWelcome = async (req, res) => {
+  sendResource(res, { message: 'Hello world!' });
+};
