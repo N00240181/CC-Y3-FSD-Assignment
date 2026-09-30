@@ -1,6 +1,5 @@
 import { jest } from '@jest/globals';
 import request from 'supertest';
-import { signToken } from '../../src/utils/jwt.js';
 
 const mockPrisma = {
     event: {
@@ -19,56 +18,47 @@ jest.unstable_mockModule('../../src/config/db.js', () => ({
 
 const { default: app } = await import('../../src/app.js');
 
-const customerToken = signToken({ sub: 13, role: 'customer' });
-const agentToken = signToken({ sub: 14, role: 'agent' });
-const adminToken = signToken({ sub: 99, role: 'admin' });
-
-const asCustomer = (req) => req.set('Authorization', `Bearer ${customerToken}`);
-const asAgent = (req) => req.set('Authorization', `Bearer ${agentToken}`);
-const asAdmin = (req) => req.set('Authorization', `Bearer ${adminToken}`);
-
 describe('/events', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('rejects a request with no Authorization header at all', async () => {
-        const res = await request(app).get('/events');
-
-        expect(res.status).toBe(401);
-        expect(mockPrisma.event.findMany).not.toHaveBeenCalled();
-    });
-
-    it('GET /events returns a list envelope scoped to the caller', async () => {
+    it('GET /events is public and returns a list envelope', async () => {
         mockPrisma.event.findMany.mockResolvedValue([
-            { id: 1, subject: 'Cannot log in', status: 'open', customerId: 13 }
+            { id: 1, bandId: 2, venueId: 3, date: '2026-10-01' }
         ]);
         mockPrisma.event.count.mockResolvedValue(1);
 
-        const res = await asCustomer(request(app).get('/events'));
+        const res = await request(app).get('/events');
 
         expect(res.status).toBe(200);
         expect(res.body.data).toHaveLength(1);
-        expect(res.body.meta).toEqual({ page: 1, pageSize: 10, total: 1, totalPages: 1 });
+        expect(res.body.meta).toEqual({ page: 1, pageSize: 20, total: 1, totalPages: 1 });
         expect(mockPrisma.event.findMany).toHaveBeenCalledWith(
-            expect.objectContaining({ where: expect.objectContaining({ customerId: 13 }) }),
+            expect.objectContaining({ where: {}, include: { band: true, venue: true } }),
         );
     });
 
-    it('GET /events?status=open filters and rejects an unknown status', async () => {
-        mockPrisma.event.findMany.mockResolvedValue([]);
-        mockPrisma.event.count.mockResolvedValue(0);
+    it('GET /events/:id is public', async () => {
+        mockPrisma.event.findFirst.mockResolvedValue({ id: 1, bandId: 2, venueId: 3 });
 
-        const ok = await asAdmin(request(app).get('/events?status=archived'));
-        expect(bad.status).toBe(400);
-        expect(bad.body.error.details).toBeDefined();
+        const res = await request(app).get('/events/1');
+
+        expect(res.status).toBe(200);
+        expect(mockPrisma.event.findFirst).toHaveBeenCalledWith({
+            where: { id: 1 },
+            include: { band: true, venue: true },
+        });
     });
 
-    it('POST /events creates an event owned by the authenticated customer', async () => {
-        mockPrisma.event.create.mockResolvedValue({
-            id: 3,
-            subject: 'Cannot reset password',
-            description: 'L'
-        })
-    })
-})
+    it('POST /events still requires authentication', async () => {
+        const res = await request(app).post('/events').send({
+            bandId: 2,
+            venueId: 3,
+            date: '2026-10-01',
+        });
+
+        expect(res.status).toBe(401);
+        expect(mockPrisma.event.create).not.toHaveBeenCalled();
+    });
+});
