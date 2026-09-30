@@ -9,4 +9,9 @@ export const EVENTS = {
     BOOKING_COMMENTED: 'booking.commented',
     BOOKING_STATUS_CHANGED: 'booking.status_changed',
     BOOKING_SLA_BREACHED: 'booking.sla_breached',
+    VENUE_CREATED: 'venue.created',
+    VENUE_ASSIGNED: 'venue.assigned',
+    VENUE_COMMENTED: 'venue.commented',
+    VENUE_STATUS_CHANGED: 'venue.status_changed',
+    VENUE_SLA_BREACHED: 'venue.sla_breached',
 };
