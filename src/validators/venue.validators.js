@@ -1,4 +1,3 @@
-import { name } from 'nodemailer/lib/package-info.js';
 import { z } from 'zod';
 
 export const venueIdParamSchema = z.object({
