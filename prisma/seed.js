@@ -57,6 +57,7 @@ async function main() {
             data: {
                 firstName: 'Eric',
                 lastName: 'Cartman',
+                username: 'ericcartman',
                 age: 25,
                 email: 'intheghetto@gmail.com',
                 password: hashedPassword,
@@ -67,6 +68,7 @@ async function main() {
             data: {
                 firstName: 'Joshua',
                 lastName: 'Block',
+                username: 'worldoftshirts',
                 age: 23,
                 email: 'worldoftshirts@gmail.com',
                 password: hashedPassword,

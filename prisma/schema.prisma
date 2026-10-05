@@ -57,7 +57,8 @@ model Customer {
   firstName String
   lastName  String
   age       Int
-  email     String
+  username  String
+  email     String @unique 
   password  String
   type      AccountType
   bookings  Booking[]
